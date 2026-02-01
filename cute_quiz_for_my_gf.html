@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valentine Quiz for Noni 💖</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+    .quiz-container {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      text-align: center;
+      position: relative;
+    }
+    h1 { color: #e91e63; }
+    .option {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      background: #ffe4ec;
+      cursor: pointer;
+    }
+    .option:hover { background: #ffc1d6; }
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background: #e91e63;
+      color: white;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #kissCounter {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 18px;
+      color: #e91e63;
+      font-weight: bold;
+    }
+    .heart {
+      position: absolute;
+      font-size: 24px;
+      animation: floatUp 1s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div id="kissCounter">💋 Kisses: 0</div>
+
+    <!-- Front Page -->
+    <div id="frontPage">
+      <h1>💖 Valentine Quiz for Noni 💖</h1>
+      <p>To my baby 🐰💋</p>
+      <p>Answer honestly… or face the consequences 😡😌</p>
+      <button onclick="startQuiz()">Start Quiz 💌</button>
+    </div>
+
+    <!-- Quiz Page -->
+    <div id="quizPage" style="display:none;">
+      <h1>Valentine Quiz for Noni 💖</h1>
+      <p id="question"></p>
+      <div id="options"></div>
+
+      <div class="nav-buttons">
+        <button id="prevBtn" onclick="prevQuestion()">⬅ Previous</button>
+        <button id="nextBtn" onclick="nextQuestion()">Next ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quiz = [
+      { q: "1. When did you first say I love you?", options: ["March 17", "Nov 29", "Aug 9", "Aug 27"], correct: 2 },
+      { q: "2. Which flowers did I give you first?", options: ["Roses", "Orchid", "Hydrangea", "Lily"], correct: 0 },
+      { q: "3. First movie that we watched?", options: ["Hari Hara Veera Mallu", "Game Changer", "Kingdom", "Thandel"], correct: 1 },
+      { q: "4. Who loves you more?", options: ["Me", "Akhil Thumma", "Creator of this quiz", "S/o Venkatrao and Sridevi"], correct: "all" },
+      { q: "5. Will you be my Valentine? 💌", options: ["Yes 💖", "No 🙄"], correct: 0 }
+    ];
+
+    let index = 0;
+    let kisses = 0;
+    const answered = new Set();
+
+    function updateKissCounter() {
+      document.getElementById('kissCounter').innerText = `💋 Kisses: ${kisses}`;
+    }
+
+    function startQuiz() {
+      document.getElementById("frontPage").style.display = "none";
+      document.getElementById("quizPage").style.display = "block";
+      loadQuestion();
+    }
+
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerText = '💖';
+      heart.style.left = `${Math.random() * 100}%`;
+      heart.style.bottom = '0px';
+      document.body.appendChild(heart);
+      setTimeout(() => document.body.removeChild(heart), 1000);
+    }
+
+    function loadQuestion() {
+      document.getElementById("question").innerText = quiz[index].q;
+      const optDiv = document.getElementById("options");
+      optDiv.innerHTML = "";
+
+      quiz[index].options.forEach((opt, i) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerText = opt;
+        div.onclick = () => checkAnswer(i);
+        optDiv.appendChild(div);
+      });
+
+      document.getElementById("prevBtn").disabled = index === 0;
+      document.getElementById("nextBtn").disabled = index === quiz.length - 1;
+    }
+
+    function checkAnswer(i) {
+      const current = quiz[index];
+      const key = index;
+      let isCorrect = false;
+
+      if (current.correct === "all" || i === current.correct) {
+        isCorrect = true;
+      }
+
+      if (isCorrect) {
+        if (!answered.has(key)) {
+          kisses++;
+          answered.add(key);
+        }
+        alert("Yay! Correct! 💖");
+        createHeart();
+        updateKissCounter();
+      } else {
+        alert("😡 You're dead after this quiz!");
+      }
+
+      // Final Valentine question
+      if (index === quiz.length - 1 && i === 0) {
+        document.getElementById("question").innerHTML = `🐰💋 Yayyy I love you Noni!!! 💖💖💖<br><br>💋 Total kisses earned: ${kisses}`;
+        document.getElementById("options").innerHTML = "";
+        document.querySelector('.nav-buttons').style.display = 'none';
+      }
+    }
+
+    function nextQuestion() {
+      if (index < quiz.length - 1) {
+        index++;
+        loadQuestion();
+      }
+    }
+
+    function prevQuestion() {
+      if (index > 0) {
+        index--;
+        loadQuestion();
+      }
+    }
+  </script>
+</body>
+</html>
